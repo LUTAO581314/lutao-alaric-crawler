@@ -8,8 +8,8 @@ Lutao Alaric 多平台数据采集仓库 —— 统一 MCP 服务 + 多平台/�
 
 - **MCP 服务**：TypeScript 实现，提供统一的 tools 接口，可接入任意支持 MCP 的 AI 客户端（opencode / Claude / Cursor 等）
 - **多平台采集**：按平台/范围模块化组织，各自独立
-- **全球数据源**：全球航班实时数据（OpenSky）、全球新闻（Google News RSS）、全球地震（USGS）
-- **World Monitor 集成**：桥接 88k+ stars 的全球实时情报仪表盘（新闻/冲突/航班/能源/金融/风险）
+- **全球数据源（全免费无 key）**：全球航班（OpenSky）、全球新闻/地缘政治（GDELT + Google News RSS）、全球天气（Open-Meteo）、全球地震（USGS）
+- **World Monitor 集成（可选，付费）**：桥接 88k+ stars 的全球实时情报仪表盘；不想付费时，GDELT + Open-Meteo 已覆盖其核心的新闻/地缘政治/天气能力
 - **可扩展**：新增采集器只需在 `mcp-server/src/collectors` 添加一个模块并在入口注册
 
 ## 模块结构
@@ -23,10 +23,12 @@ lutao-alaric-crawler/
 │   │   ├── collectors/      # 各平台/数据源采集器
 │   │   │   ├── global-flights/   # 全球航班（OpenSky）
 │   │   │   ├── global-news/      # 全球新闻（Google News RSS）
+│   │   │   ├── gdelt/            # 全球新闻/地缘政治（GDELT，免费）
+│   │   │   ├── weather/          # 全球天气（Open-Meteo，免费）
 │   │   │   ├── livestream/       # 全球实时地理（USGS 地震等）
 │   │   │   ├── domestic-social/  # 国内社交（MediaCrawler）
 │   │   │   ├── ecommerce/        # 电商（Playwright）
-│   │   │   └── world-monitor/    # World Monitor 全球情报桥接
+│   │   │   └── world-monitor/    # World Monitor 全球情报桥接（可选付费）
 │   │   └── utils/           # 通用工具（HTTP、环境变量等）
 ├── collect/                 # 各采集器的独立脚本/子模块（Python 等）
 │   ├── domestic-social/     # MediaCrawler 等开源工具集成
@@ -95,8 +97,8 @@ npm start        # 运行编译产物
 
 ## 各数据源说明
 
-> 本仓库的 MCP 服务共暴露 **11 个工具**，分两类：本地免费采集器（开箱即用，无需 key）
-> 与 World Monitor 全球情报（需 API key）。
+> 本仓库的 MCP 服务共暴露 **15 个工具**：本地免费采集器（开箱即用，无需 key）
+> 与 World Monitor 全球情报（可选，需 API key）。
 
 ### 本地免费采集器（无需 API key）
 
@@ -107,6 +109,10 @@ npm start        # 运行编译产物
 | `flight_track` | OpenSky Network | 某航班的历史飞行轨迹 |
 | `news_top` | Google News RSS | 某国家/地区实时新闻热榜 |
 | `news_search` | Google News RSS | 按关键词搜索全球新闻 |
+| `gdelt_news` | GDELT Project | 按关键词搜索全球新闻（含地缘政治，限频约 1/5s） |
+| `gdelt_trend` | GDELT Project | 关键词报道量随时间趋势（发现热点/突增） |
+| `weather_city` | Open-Meteo | 按城市名查当前天气 + 多日预报（自动转坐标） |
+| `weather_coords` | Open-Meteo | 按经纬度查天气 |
 | `earthquakes_recent` | USGS | 近 24 小时全球地震 |
 | `social_search` | MediaCrawler（需安装） | 小红书/抖音/微博/B站/快手 关键词搜索 |
 | `ecommerce_search` | Playwright（需安装） | 电商搜索（骨架，见 README） |

@@ -17,6 +17,8 @@ import { livestreamCollector } from "./collectors/livestream.js";
 import { domesticSocialCollector } from "./collectors/domestic-social.js";
 import { ecommerceCollector } from "./collectors/ecommerce.js";
 import { worldMonitorCollector } from "./collectors/world-monitor.js";
+import { gdeltCollector } from "./collectors/gdelt.js";
+import { weatherCollector } from "./collectors/weather.js";
 import type { Collector } from "./types.js";
 
 const collectors: Collector[] = [
@@ -26,6 +28,8 @@ const collectors: Collector[] = [
   domesticSocialCollector,
   ecommerceCollector,
   worldMonitorCollector,
+  gdeltCollector,
+  weatherCollector,
 ];
 
 const server = new McpServer({
