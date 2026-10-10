@@ -1,0 +1,22 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "lutao-alaric-crawler": {
+      "type": "local",
+      "command": ["node", "C:/Users/LT/Desktop/Workspace/lutao-alaric-crawler/dist/index.js"],
+      "enabled": true
+    },
+    "worldmonitor": {
+      "type": "remote",
+      "url": "https://worldmonitor.app/mcp",
+      "headers": { "X-WorldMonitor-Key": "wm_这里填你的key" },
+      "enabled": false
+    },
+    "justoneapi": {
+      "type": "remote",
+      "url": "https://mcp.justoneapi.com/mcp",
+      "headers": { "Authorization": "Bearer 这里填你的token" },
+      "enabled": false
+    }
+  }
+}
