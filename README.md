@@ -9,7 +9,9 @@ Lutao Alaric 多平台数据采集仓库 —— 统一 MCP 服务 + 多平台/�
 - **MCP 服务**：TypeScript 实现，提供统一的 tools 接口，可接入任意支持 MCP 的 AI 客户端（opencode / Claude / Cursor 等）
 - **多平台采集**：按平台/范围模块化组织，各自独立
 - **全球数据源（全免费无 key）**：全球航班（OpenSky）、全球新闻/地缘政治（GDELT + Google News RSS）、全球天气（Open-Meteo）、全球地震（USGS）
-- **World Monitor 集成（可选，付费）**：桥接 88k+ stars 的全球实时情报仪表盘；不想付费时，GDELT + Open-Meteo 已覆盖其核心的新闻/地缘政治/天气能力
+- **金融行情（免费无 key）**：全球大盘/指数/外汇/大宗（Yahoo Finance），中文别名直查（上证/纳指/标普/黄金/原油…）
+- **财经/政策新闻（免费无 key）**：华尔街见闻 + 新浪财经 + Bloomberg 多源 RSS 聚合，支持关键词过滤（政策/央行/降准…）
+- **World Monitor 集成（可选，付费）**：桥接 88k+ stars 的全球实时情报仪表盘；不想付费时，GDELT + Open-Meteo + Yahoo Finance + 财经 RSS 已覆盖其核心的新闻/地缘政治/天气/金融能力
 - **可扩展**：新增采集器只需在 `mcp-server/src/collectors` 添加一个模块并在入口注册
 
 ## 模块结构
@@ -25,6 +27,8 @@ lutao-alaric-crawler/
 │   │   │   ├── global-news/      # 全球新闻（Google News RSS）
 │   │   │   ├── gdelt/            # 全球新闻/地缘政治（GDELT，免费）
 │   │   │   ├── weather/          # 全球天气（Open-Meteo，免费）
+│   │   │   ├── finance/          # 大盘/指数/外汇/大宗（Yahoo Finance，免费）
+│   │   │   ├── finance-news/     # 财经/政策新闻（多源 RSS，免费）
 │   │   │   ├── livestream/       # 全球实时地理（USGS 地震等）
 │   │   │   ├── domestic-social/  # 国内社交（MediaCrawler）
 │   │   │   ├── ecommerce/        # 电商（Playwright）
@@ -97,7 +101,7 @@ npm start        # 运行编译产物
 
 ## 各数据源说明
 
-> 本仓库的 MCP 服务共暴露 **15 个工具**：本地免费采集器（开箱即用，无需 key）
+> 本仓库的 MCP 服务共暴露 **18 个工具**：本地免费采集器（开箱即用，无需 key）
 > 与 World Monitor 全球情报（可选，需 API key）。
 
 ### 本地免费采集器（无需 API key）
@@ -113,6 +117,9 @@ npm start        # 运行编译产物
 | `gdelt_trend` | GDELT Project | 关键词报道量随时间趋势（发现热点/突增） |
 | `weather_city` | Open-Meteo | 按城市名查当前天气 + 多日预报（自动转坐标） |
 | `weather_coords` | Open-Meteo | 按经纬度查天气 |
+| `market_index` | Yahoo Finance | 大盘/指数/外汇/大宗/个股行情，中文别名直查（上证/纳指/黄金…） |
+| `market_multi` | Yahoo Finance | 批量查询多个指数/品种行情 |
+| `finance_news` | 华尔街见闻/新浪/Bloomberg | 财经/政策新闻多源聚合，支持关键词过滤（政策/央行…） |
 | `earthquakes_recent` | USGS | 近 24 小时全球地震 |
 | `social_search` | MediaCrawler（需安装） | 小红书/抖音/微博/B站/快手 关键词搜索 |
 | `ecommerce_search` | Playwright（需安装） | 电商搜索（骨架，见 README） |
