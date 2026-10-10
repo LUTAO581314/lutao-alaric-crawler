@@ -45,6 +45,13 @@ const NAME_MAP: Record<string, string> = {
   // 加密/个股示例
   "比特币": "BTC-USD", "btc": "BTC-USD",
   "以太坊": "ETH-USD", "eth": "ETH-USD",
+  // 国债收益率 / 央行利率（Yahoo）
+  "美债10年": "^TNX", "10年期美债": "^TNX", "10年美债收益率": "^TNX", "us10y": "^TNX",
+  "美债5年": "^FVX", "5年期美债": "^FVX", "us5y": "^FVX",
+  "美债30年": "^TYX", "30年期美债": "^TYX", "us30y": "^TYX",
+  "美债3月": "^IRX", "3月美债": "^IRX", "us3m": "^IRX",
+  "联邦基金利率": "^IRL", "美联储利率": "^IRL", "fed rate": "^IRL",
+  "中国10年国债": "10YCN.B", "中债10年": "10YCN.B",
 };
 
 /** 解析名称/代码 -> Yahoo 代码 */

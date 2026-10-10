@@ -21,6 +21,9 @@ import { gdeltCollector } from "./collectors/gdelt.js";
 import { weatherCollector } from "./collectors/weather.js";
 import { financeCollector } from "./collectors/finance.js";
 import { financeNewsCollector } from "./collectors/finance-news.js";
+import { aSharesCollector } from "./collectors/a-shares.js";
+import { opinionCollector } from "./collectors/opinion.js";
+import { cryptoCollector } from "./collectors/crypto.js";
 import type { Collector } from "./types.js";
 
 const collectors: Collector[] = [
@@ -34,6 +37,9 @@ const collectors: Collector[] = [
   weatherCollector,
   financeCollector,
   financeNewsCollector,
+  aSharesCollector,
+  opinionCollector,
+  cryptoCollector,
 ];
 
 const server = new McpServer({
