@@ -21,6 +21,9 @@ collect/**/*.jsonl
 # MediaCrawler（vendored clone，用 scripts/setup-media.mjs 安装）
 tools/mediacrawler/
 
+# 登录态备份（含 cookies，默认本地留存；如需随仓库走可去掉下面这行并提交）
+backups/
+
 # IDE
 .idea/
 .vscode/
