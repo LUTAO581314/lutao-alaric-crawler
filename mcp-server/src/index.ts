@@ -24,6 +24,9 @@ import { financeNewsCollector } from "./collectors/finance-news.js";
 import { aSharesCollector } from "./collectors/a-shares.js";
 import { opinionCollector } from "./collectors/opinion.js";
 import { cryptoCollector } from "./collectors/crypto.js";
+import { bilibiliCollector } from "./collectors/bilibili.js";
+import { youtubeCollector } from "./collectors/youtube.js";
+import { shopifyCollector } from "./collectors/shopify.js";
 import type { Collector } from "./types.js";
 
 const collectors: Collector[] = [
@@ -40,6 +43,9 @@ const collectors: Collector[] = [
   aSharesCollector,
   opinionCollector,
   cryptoCollector,
+  bilibiliCollector,
+  youtubeCollector,
+  shopifyCollector,
 ];
 
 const server = new McpServer({

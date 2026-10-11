@@ -7,11 +7,13 @@ Lutao Alaric 多平台数据采集仓库 —— 统一 MCP 服务 + 多平台/�
 ## 特性
 
 - **MCP 服务**：TypeScript 实现，提供统一的 tools 接口，可接入任意支持 MCP 的 AI 客户端（opencode / Claude / Cursor 等）
-- **多平台采集**：按平台/范围模块化组织，各自独立
+- **多平台采集**：按平台/范围模块化组织，各自独立，**30 个工具、16 个采集器**
 - **全球数据源（全免费无 key）**：全球航班（OpenSky）、全球新闻/地缘政治（GDELT + Google News RSS）、全球天气（Open-Meteo）、全球地震（USGS）
-- **金融行情（免费无 key）**：全球大盘/指数/外汇/大宗（Yahoo Finance），中文别名直查（上证/纳指/标普/黄金/原油…）
-- **财经/政策新闻（免费无 key）**：华尔街见闻 + 新浪财经 + Bloomberg 多源 RSS 聚合，支持关键词过滤（政策/央行/降准…）
-- **World Monitor 集成（可选，付费）**：桥接 88k+ stars 的全球实时情报仪表盘；不想付费时，GDELT + Open-Meteo + Yahoo Finance + 财经 RSS 已覆盖其核心的新闻/地缘政治/天气/金融能力
+- **金融行情（免费无 key）**：全球大盘/指数/外汇/大宗/国债/央行利率（Yahoo Finance），加密货币多源容错（OKX/Binance/CoinGecko/Yahoo），中文别名直查
+- **A股/板块（免费无 key）**：东方财富个股/行业板块/概念板块/涨幅榜，中文名称自动解析
+- **财经/政策新闻 + 舆情（免费无 key）**：华尔街见闻/新浪/Bloomberg 财经 RSS + 东方财富 7x24 快讯 + 微博/百度/知乎/B站/抖音热搜
+- **跨平台社媒 + 商城（免费无 key）**：B站热门/排行/视频、YouTube 视频、Shopify 任意店铺商品
+- **World Monitor 集成（可选，付费）**：桥接 88k+ stars 的全球实时情报仪表盘
 - **可扩展**：新增采集器只需在 `mcp-server/src/collectors` 添加一个模块并在入口注册
 
 ## 模块结构
@@ -29,11 +31,17 @@ lutao-alaric-crawler/
 │   │   │   ├── weather/          # 全球天气（Open-Meteo，免费）
 │   │   │   ├── finance/          # 大盘/指数/外汇/大宗（Yahoo Finance，免费）
 │   │   │   ├── finance-news/     # 财经/政策新闻（多源 RSS，免费）
+│   │   │   ├── a-shares/         # A股/行业/概念/榜单（东方财富，免费）
+│   │   │   ├── opinion/          # 舆情：财经快讯 + 多平台热搜（免费）
+│   │   │   ├── crypto/           # 加密货币行情（多源容错，免费）
+│   │   │   ├── bilibili/         # B站社媒/视频（热门/排行/视频，免费）
+│   │   │   ├── youtube/          # YouTube 视频（oEmbed，免费）
+│   │   │   ├── shopify/          # Shopify 海外商城商品（免费）
 │   │   │   ├── livestream/       # 全球实时地理（USGS 地震等）
 │   │   │   ├── domestic-social/  # 国内社交（MediaCrawler）
 │   │   │   ├── ecommerce/        # 电商（Playwright）
 │   │   │   └── world-monitor/    # World Monitor 全球情报桥接（可选付费）
-│   │   └── utils/           # 通用工具（HTTP、环境变量等）
+│   │   └── utils/           # 通用工具（HTTP、RSS、环境变量等）
 ├── collect/                 # 各采集器的独立脚本/子模块（Python 等）
 │   ├── domestic-social/     # MediaCrawler 等开源工具集成
 │   ├── ecommerce/
@@ -101,26 +109,54 @@ npm start        # 运行编译产物
 
 ## 各数据源说明
 
-> 本仓库的 MCP 服务共暴露 **18 个工具**：本地免费采集器（开箱即用，无需 key）
+> 本仓库的 MCP 服务共暴露 **30 个工具**：本地免费采集器（开箱即用，无需 key）
 > 与 World Monitor 全球情报（可选，需 API key）。
 
-### 本地免费采集器（无需 API key）
+### 全球数据源（无需 API key）
 
 | 工具 | 数据源 | 说明 |
 |------|--------|------|
-| `flights_all` | OpenSky Network | 全球当前所有在飞民航航班实时状态 |
-| `flights_area` | OpenSky Network | 指定经纬度边界框内的实时航班 |
-| `flight_track` | OpenSky Network | 某航班的历史飞行轨迹 |
-| `news_top` | Google News RSS | 某国家/地区实时新闻热榜 |
-| `news_search` | Google News RSS | 按关键词搜索全球新闻 |
-| `gdelt_news` | GDELT Project | 按关键词搜索全球新闻（含地缘政治，限频约 1/5s） |
-| `gdelt_trend` | GDELT Project | 关键词报道量随时间趋势（发现热点/突增） |
-| `weather_city` | Open-Meteo | 按城市名查当前天气 + 多日预报（自动转坐标） |
-| `weather_coords` | Open-Meteo | 按经纬度查天气 |
-| `market_index` | Yahoo Finance | 大盘/指数/外汇/大宗/个股行情，中文别名直查（上证/纳指/黄金…） |
-| `market_multi` | Yahoo Finance | 批量查询多个指数/品种行情 |
-| `finance_news` | 华尔街见闻/新浪/Bloomberg | 财经/政策新闻多源聚合，支持关键词过滤（政策/央行…） |
+| `flights_all` / `flights_area` / `flight_track` | OpenSky Network | 全球航班实时状态/区域/轨迹 |
+| `news_top` / `news_search` | Google News RSS | 地区新闻热榜 / 关键词搜索 |
+| `gdelt_news` / `gdelt_trend` | GDELT Project | 全球新闻（含地缘政治）/ 关键词趋势 |
+| `weather_city` / `weather_coords` | Open-Meteo | 城市/坐标 天气 + 预报（自动转坐标） |
 | `earthquakes_recent` | USGS | 近 24 小时全球地震 |
+
+### 金融行情（无需 API key）
+
+| 工具 | 数据源 | 说明 |
+|------|--------|------|
+| `market_index` / `market_multi` | Yahoo Finance | 大盘/指数/外汇/大宗/国债/央行利率，中文别名直查，可批量 |
+| `crypto_price` | OKX/Binance/CoinGecko/Yahoo | 加密货币行情（多源容错，自动切换） |
+
+### A股 / 板块（无需 API key）
+
+| 工具 | 数据源 | 说明 |
+|------|--------|------|
+| `a_stock` | 东方财富 | A股个股实时行情（代码或中文名，自动解析） |
+| `a_sectors` | 东方财富 | 行业板块 / 概念板块涨幅榜 |
+| `a_ranking` | 东方财富 | A股涨幅榜 / 跌幅榜 / 成交额榜 |
+
+### 财经新闻 / 舆情 / 舆论（无需 API key）
+
+| 工具 | 数据源 | 说明 |
+|------|--------|------|
+| `finance_news` | 华尔街见闻/新浪/Bloomberg | 财经/政策新闻多源聚合，支持关键词过滤 |
+| `finance_flash` | 东方财富 7x24 | 全球财经快讯（实时舆情/政策信号） |
+| `hot_search` | 60s 聚合 | 微博/百度/知乎/B站/抖音 热搜榜（舆论风向） |
+
+### 跨平台社媒 / 商城（无需 API key）
+
+| 工具 | 数据源 | 说明 |
+|------|--------|------|
+| `bilibili_hot` / `bilibili_ranking` / `bilibili_video` | B站 | 热门视频 / 分区排行 / 视频详情 |
+| `youtube_video` | YouTube oEmbed | 视频信息（标题/频道/缩略图） |
+| `shopify_products` / `shopify_search` | Shopify | 任意 Shopify 店铺商品 / 店内检索 |
+
+### 其它
+
+| 工具 | 数据源 | 说明 |
+|------|--------|------|
 | `social_search` | MediaCrawler（需安装） | 小红书/抖音/微博/B站/快手 关键词搜索 |
 | `ecommerce_search` | Playwright（需安装） | 电商搜索（骨架，见 README） |
 
