@@ -13,6 +13,8 @@ Lutao Alaric 多平台数据采集仓库 —— 统一 MCP 服务 + 多平台/�
 - **A股/板块（免费无 key）**：东方财富个股/行业板块/概念板块/涨幅榜，中文名称自动解析
 - **财经/政策新闻 + 舆情（免费无 key）**：华尔街见闻/新浪/Bloomberg 财经 RSS + 东方财富 7x24 快讯 + 微博/百度/知乎/B站/抖音热搜
 - **跨平台社媒 + 商城（免费无 key）**：B站热门/排行/视频、YouTube 视频、Shopify 任意店铺商品
+- **国内社媒深度采集（MediaCrawler，无头浏览器）**：B站/小红书/抖音/微博/贴吧/知乎 关键词搜索、博主内容，返回标题/播放/点赞/弹幕/评论/收藏等统计（各平台一次性扫码登录）
+- **电商商品搜索（Playwright）**：books.toscrape 稳定开放站（任意环境可用）+ Amazon/eBay 真实大站（受 IP 反爬影响）
 - **World Monitor 集成（可选，付费）**：桥接 88k+ stars 的全球实时情报仪表盘
 - **可扩展**：新增采集器只需在 `mcp-server/src/collectors` 添加一个模块并在入口注册
 
@@ -41,16 +43,13 @@ lutao-alaric-crawler/
 │   │   │   ├── domestic-social/  # 国内社交（MediaCrawler）
 │   │   │   ├── ecommerce/        # 电商（Playwright）
 │   │   │   └── world-monitor/    # World Monitor 全球情报桥接（可选付费）
-│   │   └── utils/           # 通用工具（HTTP、RSS、环境变量等）
-├── collect/                 # 各采集器的独立脚本/子模块（Python 等）
-│   ├── domestic-social/     # MediaCrawler 等开源工具集成
-│   ├── ecommerce/
-│   ├── global-news/
-│   ├── global-flights/
-│   └── livestream/
-├── config/                  # 配置文件（API key、代理、频率等）
-├── scripts/                 # 辅助脚本（启动、调度、部署）
-└── .env                     # 环境变量（不入库，见 .env.example）
+ │   │   └── utils/           # 通用工具（HTTP、RSS、环境变量等）
+ ├── tools/                   # 集成的开源工具（独立 venv，不污染主环境）
+ │   └── mediacrawler/        # MediaCrawler（国内社媒采集，Python，uv 管理 venv）
+ ├── scripts/                 # 辅助脚本
+ │   └── social-login.mjs     # MediaCrawler 一键扫码登录（node scripts/social-login.mjs --platform bilibili）
+  ├── config/                  # 配置文件（API key、代理、频率等）
+  └── .env                     # 环境变量（不入库，见 .env.example）
 ```
 
 ## 快速开始
@@ -157,8 +156,8 @@ npm start        # 运行编译产物
 
 | 工具 | 数据源 | 说明 |
 |------|--------|------|
-| `social_search` | MediaCrawler（需安装） | 小红书/抖音/微博/B站/快手 关键词搜索 |
-| `ecommerce_search` | Playwright（需安装） | 电商搜索（骨架，见 README） |
+| `social_search` | MediaCrawler（无头浏览器） | B站/小红书/抖音/微博/贴吧/知乎 关键词搜索、博主内容，返回播放/点赞/评论等统计；各平台需先扫码登录（见下） |
+| `ecommerce_search` | Playwright / HTTP | 电商商品搜索：books（books.toscrape，稳定兜底，默认）/ amazon / ebay（真实大站，可能受 IP 反爬） |
 
 ### World Monitor 全球实时情报（需 API key）
 
@@ -203,8 +202,38 @@ World Monitor 工具，无需经过本仓库。
 > 许可证说明：World Monitor 源码为 AGPL-3.0。本仓库通过其**官方公开 MCP/REST 端点**
 > 调用，属于使用其提供的服务，不构成对源码的修改，故与本仓库的 MIT 许可不冲突。
 
-### 国内社交（domestic-social）
-通过 [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) 开源工具采集小红书、抖音、微博、B 站、快手等。参见 `collect/domestic-social/README.md`。
+### 国内社交（domestic-social，MediaCrawler）
+通过 [MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) 开源工具（无头浏览器）深度采集 B站/小红书/抖音/微博/贴吧/知乎 的内容，返回标题、播放/点赞/弹幕/评论/收藏/投币等统计、链接、作者。
+
+**安装（一次性）**（需先 `pip install uv`）：
+```bash
+node scripts/setup-media.mjs   # 一键：clone MediaCrawler + 装依赖 + 装 chromium + 关闭 CDP
+```
+或手动：
+```bash
+cd tools/mediacrawler
+uv sync                                  # 安装 Python 依赖（独立 venv，不污染主环境）
+uv run python -m playwright install chromium   # 安装浏览器
+```
+
+**登录（每个平台一次性，扫码）**：MediaCrawler 用真实浏览器 + 登录态采集，首次需扫码；登录态存于 `tools/mediacrawler/browser_data/<平台>`，之后 headless 复用免登录。
+```bash
+node scripts/social-login.mjs --platform bilibili      # 弹出浏览器窗口，用 B站 App 扫码
+node scripts/social-login.mjs --platform xiaohongshu   # 其它平台同理
+```
+
+**使用**：登录后即可调用 `social_search`（headless 复用登录态）：
+`social_search(platform="bilibili", keyword="机器学习", limit=10)`。
+
+> 本仓库已把 MediaCrawler 改为 standard 模式 + 关闭代理（`config/base_config.py` 的
+> `ENABLE_CDP_MODE = False`），因此不依赖你本地 Chrome 及其代理设置。
+
+### 电商商品搜索（ecommerce）
+`ecommerce_search` 支持三个平台：
+- **books**（默认）：books.toscrape.com 稳定开放电商站，真实图书商品 + 价格 + 库存，任何网络环境都能返回（推荐先用它验证功能）；支持 `page` 翻页。
+- **amazon / ebay**：用 Playwright 无头浏览器真实抓取。大站对机房 IP / 无 cookie 有反爬，结果可能不完整或为空；网络环境好时可正常返回。
+
+> 依赖：`npm install playwright` + `npx playwright install chromium`（本仓库已装好）。
 
 ### 全球航班（global-flights）
 基于 [OpenSky Network](https://opensky-network.org/) 开放 API，获取全球任意区域实时的民航航班位置、高度、速度、航向等数据。无需 key 可匿名调用。

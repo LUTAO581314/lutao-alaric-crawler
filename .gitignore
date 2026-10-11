@@ -18,6 +18,9 @@ collect/**/output/
 collect/**/cookies/
 collect/**/*.jsonl
 
+# MediaCrawler（vendored clone，用 scripts/setup-media.mjs 安装）
+tools/mediacrawler/
+
 # IDE
 .idea/
 .vscode/
