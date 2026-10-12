@@ -74,13 +74,13 @@ child.on('error', (e) => {
   console.log('启动失败:', e.message);
   process.exit(1);
 });
-child.on('close', (code) => {
-  const bd = path.join(MEDIA_ROOT, 'browser_data', mc);
-  const ok = existsSync(bd) && readdirSync(bd).length > 0;
-  console.log(`\n=== 登录流程结束 (退出码 ${code}) ===`);
-  if (ok) {
-    console.log(`✅ 登录态已保存到 browser_data/${mc}，现在 social_search 可采集 ${platform}。`);
-  } else {
-    console.log(`⚠️ 未检测到登录态（browser_data/${mc} 为空）。若已扫码，请重试。`);
-  }
-});
+  child.on('close', (code) => {
+    const bd = path.join(MEDIA_ROOT, 'browser_data', `${mc}_user_data_dir`);
+    const ok = existsSync(bd) && readdirSync(bd).length > 0;
+    console.log(`\n=== 登录流程结束 (退出码 ${code}) ===`);
+    if (ok) {
+      console.log(`✅ 登录态已保存到 browser_data/${mc}_user_data_dir，现在 social_search 可采集 ${platform}。`);
+    } else {
+      console.log(`⚠️ 未检测到登录态（browser_data/${mc}_user_data_dir 为空）。若已扫码，请重试。`);
+    }
+  });
